@@ -5,6 +5,14 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Temp",
+      "type": "python",
+      "request": "launch",
+      "program": "temp.py",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
       "name": "Test",
       "type": "python",
       "request": "launch",

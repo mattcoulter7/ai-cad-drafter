@@ -8,6 +8,13 @@ class BaseObjectExtractor(object):
     def __init__(self, layers: T.List[str]) -> None:
         self.layers = layers
 
+    def extract_entities(self, drawing):
+        def entity_on_layer(entity) -> bool:
+            return entity.layer in self.layers
+
+        entities = [entity for entity in drawing.modelspace() if entity_on_layer(entity)]
+        return entities
+
     def extract_blocks(self, drawing):
         def block_on_layer(block) -> bool:
             block_entities_on_layer = [ent for ent in block._entities if ent.layer in self.layers]

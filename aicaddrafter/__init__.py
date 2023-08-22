@@ -42,7 +42,7 @@ def test(
     )
 
     wall_entities = [
-        ent for ent in drawing.paperspace() if (
+        ent for ent in drawing.modelspace() if (
             ent.layer in wall_layers
         )
     ]

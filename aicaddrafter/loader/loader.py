@@ -2,6 +2,8 @@ import dxfgrabber
 from dxfgrabber.drawing import Drawing
 import pickle
 import os
+import ezdxf
+from pyautocad import Autocad
 
 from pathlib import Path
 
