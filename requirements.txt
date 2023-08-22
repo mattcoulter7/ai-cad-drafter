@@ -1,3 +1,4 @@
 dxfgrabber
-werkzeug
-gunicorn
+python-dotenv
+ezdxf
+matplotlib
