@@ -8,7 +8,8 @@ load_dotenv()
 def main():
     aicaddrafter.test(
         file_name=os.getenv("FILE_NAME"),
-        layers=os.getenv("LAYERS").split(",")
+        wall_layers=os.getenv("WALL_LAYERS").split(","),
+        window_layers=os.getenv("WINDOW_LAYERS").split(",")
     )
 
 

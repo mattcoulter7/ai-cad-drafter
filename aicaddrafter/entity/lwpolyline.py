@@ -1,5 +1,7 @@
 import typing as T
-from .base import BaseEntityExtractor, Line
+from .base import BaseEntityExtractor
+
+from shapely import LineString
 
 
 class LWPolyLineExtractor(BaseEntityExtractor):
@@ -8,23 +10,21 @@ class LWPolyLineExtractor(BaseEntityExtractor):
             type="LWPOLYLINE"
         )
 
-    def extract_lines(self, entities) -> T.List[Line]:
+    def extract_lines(self, entities) -> T.List[LineString]:
         entities = self.filter_entities(entities)
         lines = []
 
-        def explode(entity) -> T.List[Line]:
+        def explode(entity) -> T.List[LineString]:
             lines = []
             for i in range(len(entity.points)):
                 j = i + 1
                 if j > len(entity.points) - 1:
                     j = 0
                 lines.append(
-                    Line(
-                        x1=entity.points[i][0],
-                        y1=entity.points[i][1],
-                        x2=entity.points[j][0],
-                        y2=entity.points[j][1],
-                    )
+                    LineString((
+                        (entity.points[i][0], entity.points[i][1]),
+                        (entity.points[j][0], entity.points[j][1])
+                    ))
                 )
             return lines
 

@@ -2,3 +2,5 @@ dxfgrabber
 python-dotenv
 ezdxf
 matplotlib
+shapely
+pyautocad

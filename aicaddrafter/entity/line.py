@@ -1,5 +1,7 @@
 import typing as T
-from .base import BaseEntityExtractor, Line
+from .base import BaseEntityExtractor
+
+from shapely import LineString
 
 
 class LineExtractor(BaseEntityExtractor):
@@ -8,13 +10,11 @@ class LineExtractor(BaseEntityExtractor):
             type="LINE"
         )
 
-    def extract_lines(self, entities) -> T.List[Line]:
+    def extract_lines(self, entities) -> T.List[LineString]:
         entities = self.filter_entities(entities)
         return [
-            Line(
-                x1=ent.start[0],
-                y1=ent.start[1],
-                x2=ent.end[0],
-                y2=ent.end[1],
-            ) for ent in entities
+            LineString((
+                (ent.start[0], ent.start[1]),
+                (ent.end[0], ent.end[1])
+            )) for ent in entities
         ]
