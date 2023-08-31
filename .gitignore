@@ -161,3 +161,4 @@ cython_debug/
 
 # pickle files
 *.pkl
+*.dxf
