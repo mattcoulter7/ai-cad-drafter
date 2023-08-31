@@ -1,0 +1,45 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Docker Image",
+            "type": "shell",
+            "command": "docker build -f ${input:docker_file_name} -t ${input:docker_image_name} .",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "label": "Run Docker Compose",
+            "type": "shell",
+            "command": "docker compose -f docker/${input:docker_compose_file} up --no-start",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build"
+            }
+        }
+    ],
+    "inputs": [
+        {
+            "id": "docker_file_name",
+            "type": "promptString",
+            "default": "dev.Dockerfile",
+            "description": "Dockerfile Name"
+        },
+        {
+            "id": "docker_image_name",
+            "type": "promptString",
+            "default": "ai-cad-drafter",
+            "description": "Docker Image Name"
+        },
+        {
+            "id": "docker_compose_file",
+            "type": "promptString",
+            "default": "docker-compose.yml",
+            "description": "Docker Compose File"
+        }
+    ]
+}

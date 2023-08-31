@@ -1,0 +1,9 @@
+dxfgrabber
+python-dotenv
+ezdxf
+matplotlib
+shapely
+pyautocad
+msgpack
+scikit-learn
+numpy
