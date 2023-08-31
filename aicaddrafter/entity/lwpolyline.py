@@ -16,7 +16,7 @@ class LWPolyLineExtractor(BaseEntityExtractor):
 
         def explode(entity) -> T.List[LineString]:
             lines = []
-            for i in range(len(entity.points)):
+            for i in range(len(entity.points) - 1):
                 j = i + 1
                 if j > len(entity.points) - 1:
                     j = 0
