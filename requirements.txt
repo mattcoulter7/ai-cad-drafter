@@ -7,3 +7,4 @@ pyautocad
 msgpack
 scikit-learn
 numpy
+gdown
