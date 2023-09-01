@@ -1,5 +1,6 @@
 import aicaddrafter
 import os
+import pandas as pd
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -13,12 +14,14 @@ def main():
         lintels_layers=os.getenv("LINTELS_LAYERS").split(","),
     )
 
+    path = Path("data/0.1.1.processed.csv")
     df.to_csv(
-        Path("data/processed.csv"),
+        path,
         index=False,
         header=['x', 'y', 'label', 'file']
     )
 
+    df = pd.read_csv(path)
     (
         wall_lines,
         lintel_lines,
