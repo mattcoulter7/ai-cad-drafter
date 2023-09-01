@@ -74,9 +74,9 @@ class WindowExtractor(BaseObjectExtractor):
             y_values = []
 
             for line in lines:
-                for point in line.xy:
-                    x_values.append(point[0])
-                    y_values.append(point[1])
+                for x_val, y_val in line.coords:
+                    x_values.append(x_val)
+                    y_values.append(y_val)
 
             min_x = min(x_values)
             min_y = min(y_values)

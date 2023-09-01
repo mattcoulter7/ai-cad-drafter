@@ -6,5 +6,6 @@ from . import (
 
 from .core import (
     process_files,
-    process_file
+    process_file,
+    extract_lines
 )

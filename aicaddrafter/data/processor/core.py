@@ -27,7 +27,7 @@ def process_files(
     lintels_layers: T.List[str],
 ) -> T.Tuple[np.ndarray, np.ndarray]:
     points = []
-    with ThreadPoolExecutor(16) as executor:
+    with ThreadPoolExecutor(128) as executor:
         for df in executor.map(
             lambda file_name: process_file(
                 file_name=file_name,
@@ -46,21 +46,22 @@ def process_file(
     wall_layers: T.List[str],
     lintels_layers: T.List[str],
 ) -> pd.DataFrame:
+    logger.info(f"Processing file `{file_name}`")
     drawing = load_drawing(file_name)
 
     points = []
-    for line in _extract_lines(drawing, wall_layers):
-        for x_val, y_val in line.xy:
+    for line in extract_lines(drawing, wall_layers):
+        for x_val, y_val in line.coords:
             points.append({'x': x_val, 'y': y_val, 'label': 'wall', 'file': file_name})
 
-    for line in _extract_lines(drawing, lintels_layers):
-        for x_val, y_val in line.xy:
+    for line in extract_lines(drawing, lintels_layers):
+        for x_val, y_val in line.coords:
             points.append({'x': x_val, 'y': y_val, 'label': 'lintel', 'file': file_name})
 
     return pd.DataFrame(points)
 
 
-def _extract_lines(
+def extract_lines(
     drawing,
     layers
 ) -> T.List[LineString]:
