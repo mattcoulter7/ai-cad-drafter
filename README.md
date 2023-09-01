@@ -35,13 +35,9 @@ Activate the newly created environment using the following command:
 ```bash
 conda activate tf_gpu_env
 ```
-## 4. Install TensorFlow with GPU Support:
-While the environment is active, you can install TensorFlow with GPU support using the following command:
 
-```bash
-conda install tensorflow-gpu
-```
-This will install TensorFlow along with the necessary GPU dependencies.
+## 4. Install Tensorflow
+Following the instructions here to get Tensorflow installed https://www.tensorflow.org/install/pip
 
 ## 5. Verify Installation:
 You can verify that TensorFlow has been installed successfully by running a Python script within your activated environment:
@@ -53,10 +49,10 @@ print(tf.config.list_physical_devices('GPU'))
 ```
 The `print(tf.config.list_physical_devices('GPU'))` line should output information about the available GPUs if TensorFlow GPU support is properly configured.
 
-Remember to activate the "tf_gpu_env" environment every time you want to use TensorFlow with GPU support:
-
+## 6. Install Requirements
 ```bash
-conda activate tf_gpu_env
+pip install -r requirements_dev.txt
 ```
 
-If you encounter any issues during installation or activation, refer to the official TensorFlow installation guide for troubleshooting: https://www.tensorflow.org/install
+# RUNNING THE CODE
+## TODO
