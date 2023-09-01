@@ -8,3 +8,6 @@ msgpack
 scikit-learn
 numpy
 gdown
+pandas
+keras
+tensorflow
