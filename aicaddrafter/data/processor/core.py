@@ -17,6 +17,8 @@ from .loader import (
     load_drawing
 )
 
+from .augmentation import augment, rotate, transpose
+
 
 logger = logging.getLogger()
 
@@ -25,18 +27,21 @@ def process_files(
     file_names: T.List[str],
     wall_layers: T.List[str],
     lintels_layers: T.List[str],
-) -> T.Tuple[np.ndarray, np.ndarray]:
+    perform_augmentation: bool = False
+) -> pd.DataFrame:
     points = []
     with ThreadPoolExecutor(128) as executor:
-        for df in executor.map(
+        for dfs in executor.map(
             lambda file_name: process_file(
                 file_name=file_name,
                 wall_layers=wall_layers,
-                lintels_layers=lintels_layers
+                lintels_layers=lintels_layers,
+                perform_augmentation=perform_augmentation
             ),
             file_names
         ):
-            points.extend(df.values)
+            for df in dfs:
+                points.extend(df.values)
 
     return pd.DataFrame(points)
 
@@ -45,7 +50,8 @@ def process_file(
     file_name: str,
     wall_layers: T.List[str],
     lintels_layers: T.List[str],
-) -> pd.DataFrame:
+    perform_augmentation: bool = False
+) -> T.List[pd.DataFrame]:
     logger.info(f"Processing file `{file_name}`")
     drawing = load_drawing(file_name)
 
@@ -58,7 +64,21 @@ def process_file(
         for x_val, y_val in line.coords:
             points.append({'x': x_val, 'y': y_val, 'label': 'lintel', 'file': file_name})
 
-    return pd.DataFrame(points)
+    if not points:
+        return []
+
+    df = pd.DataFrame(points)
+    dfs = [df]
+    if perform_augmentation is True:
+        dfs = augment(
+            dfs=dfs,
+            augmentors=[
+                rotate,
+                transpose
+            ]
+        )
+
+    return dfs
 
 
 def extract_lines(

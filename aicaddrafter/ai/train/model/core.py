@@ -1,168 +1,62 @@
-from keras.layers import Dense, Dropout, Activation, InputLayer
-from keras.layers import LSTM, GRU, SimpleRNN
-from keras.models import Sequential
-from keras.models import load_model
+import typing as T
+import tensorflow as tf
+import keras
+from keras.layers import (
+    Dense,
+    Input,
+    LSTM,
+    Dense,
+    Embedding,
+    TimeDistributed,
+    Concatenate,
+    Attention
+)
+from keras.models import (
+    Model,
+    load_model
+)
 
 
-def get_lstm(units):
-    """LSTM(Long Short-Term Memory)
-    Build LSTM Model.
+def get_seq2seq(config: dict) -> Model:
+    # Input tensor for the encoder
+    encoder_inputs = Input(shape=(None, config["n_input_features"]))
 
-    # Arguments
-        units: List(int), number of input, output and hidden units.
-    # Returns
-        model: Model, nn model.
-    """
+    # LSTM encoder
+    encoder = LSTM(config["n_units"], return_state=True)
+    encoder_outputs, state_h, state_c = encoder(encoder_inputs)
+    # Discard `encoder_outputs` and only keep the states.
+    encoder_states = [state_h, state_c]
 
-    model = Sequential()
-    for i in range(1,len(units)):
-        if i == 1:
-            model.add(LSTM(units[1], input_shape=(units[0], 1), return_sequences=True))
-        elif i == len(units) - 1:
-            model.add(Dropout(0.2))
-            model.add(Dense(units[i], activation='sigmoid'))
-        elif i < len(units) - 2:
-            model.add(LSTM(units[i], return_sequences=True))
-        else:
-            model.add(LSTM(units[i]))
-        
-
-    return model
-
-
-def get_gru(units):
-    """GRU(Gated Recurrent Unit)
-    Build GRU Model.
-
-    # Arguments
-        units: List(int), number of input, output and hidden units.
-    # Returns
-        model: Model, nn model.
-    """
-    model = Sequential()
-    for i in range(1, len(units)):
-        if i == 1:
-            model.add(GRU(units[1], input_shape=(units[0], 1), return_sequences=True, reset_after=True))
-        elif i == len(units) - 1:
-            model.add(Dropout(0.2))
-            model.add(Dense(units[i], activation='sigmoid'))
-        elif i < len(units) - 2:
-            model.add(GRU(units[i], return_sequences=True))
-        else:
-            model.add(GRU(units[i]))
-
-    return model
-
-def get_rnn(units):
-    """LSTM(Long Short-Term Memory)
-    Build LSTM Model.
-
-    # Arguments
-        units: List(int), number of input, output and hidden units.
-    # Returns
-        model: Model, nn model.
-    """
-
-    model = Sequential()
-    for i in range(1,len(units)):
-        if i == 1:
-            model.add(SimpleRNN(units[1], input_shape=(units[0], 1), return_sequences=True))
-        elif i == len(units) - 1:
-            model.add(Dropout(0.2))
-            model.add(Dense(units[i], activation='sigmoid'))
-        elif i < len(units) - 2:
-            model.add(SimpleRNN(units[i], return_sequences=True))
-        else:
-            model.add(SimpleRNN(units[i]))
-
-
-    return model
-
-
-def _get_sae(inputs, hidden, output):
-    """SAE(Auto-Encoders)
-    Build SAE Model.
-
-    # Arguments
-        inputs: Integer, number of input units.
-        hidden: Integer, number of hidden units.
-        output: Integer, number of output units.
-    # Returns
-        model: Model, nn model.
-    """
-
-    model = Sequential()
-    model.add(Dense(hidden, input_dim=inputs, name='hidden'))
-    model.add(Activation('sigmoid'))
-    model.add(Dropout(0.2))
-    model.add(Dense(output, activation='sigmoid'))
-
-    return model
-
-
-def get_saes(layers):
-    """SAEs(Stacked Auto-Encoders)
-    Build SAEs Model.
-
-    # Arguments
-        layers: List(int), number of input, output and hidden units.
-    # Returns
-        models: List(Model), List of SAE and SAEs.
-    """
-    sae1 = _get_sae(layers[0], layers[1], layers[-1])
-    sae2 = _get_sae(layers[1], layers[2], layers[-1])
-    sae3 = _get_sae(layers[2], layers[3], layers[-1])
-
-    saes = Sequential()
-    saes.add(Dense(layers[1], input_dim=layers[0], name='hidden1'))
-    saes.add(Activation('sigmoid'))
-    saes.add(Dense(layers[2], name='hidden2'))
-    saes.add(Activation('sigmoid'))
-    saes.add(Dense(layers[3], name='hidden3'))
-    saes.add(Activation('sigmoid'))
-    saes.add(Dropout(0.2))
-    saes.add(Dense(layers[4], activation='sigmoid'))
-
-    models = [sae1, sae2, sae3, saes]
-
-    return models
-
-def get_new_saes(inputs, output, auto_encoder_count = 3, encoder_size = 5,fine_tuning_layers = []):
-    saes = Sequential()
-    # input
-    saes.add(InputLayer(inputs))
-
-    # auto encoders
-    for i in range(auto_encoder_count):
-        saes.add(Dense(encoder_size, name=f'hidden{(i+1) * 2 - 1}')) # encode
-        saes.add(Activation('ReLU'))
-        saes.add(Dense(inputs, name=f'hidden{(i+1) * 2}')) # decode
-        saes.add(Activation('sigmoid'))
+    # Set up the decoder. The decoder will use `encoder_states` as its initial state.
+    decoder_inputs = Input(shape=(None, config["n_output_features"]))
+    decoder_lstm = LSTM(config["n_units"], return_sequences=True, return_state=True)
     
-    # Model Fine Tuning
-    for i in range(len(fine_tuning_layers)):
-        saes.add(Dense(fine_tuning_layers[i], name=f'hidden{auto_encoder_count * 2 + 1 + (i + 1)}'))
-        saes.add(Activation('sigmoid'))
+    decoder_outputs, _, _ = decoder_lstm(decoder_inputs, initial_state=encoder_states)
+    decoder_dense = Dense(config["n_output_features"], activation='relu')
+    decoder_outputs = decoder_dense(decoder_outputs)
 
-    # output
-    saes.add(Dropout(0.2))
-    saes.add(Dense(output, activation='sigmoid'))
-
-    return saes
-    
-def get_average(units):
-    model = Sequential()
-    # input
-
-    for i in range(len(units) - 1):
-        dim = units[i]
-        if i==0:
-            model.add(InputLayer(dim))
-        else:
-            model.add(Dense(dim, name=f'hidden{i}')) # encode
-            model.add(Activation('ReLU'))
-    
-    model.add(Dropout(0.2))
-    model.add(Dense(units[len(units) - 1], activation='sigmoid'))
+    # Create the model
+    model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
 
     return model
+
+
+def load_models(fp, config) -> T.Tuple[Model, Model]:
+    model = load_model(fp)
+    # Detailed layer extraction depends on saved model structure
+    encoder_inputs = model.input[0]
+    _, state_h_enc, state_c_enc = model.layers[2].output
+    encoder_model = Model(encoder_inputs, [state_h_enc, state_c_enc])
+
+    decoder_inputs = Input(shape=(None, config["n_output_features"]))
+    decoder_state_input_h = Input(shape=(config["n_units"],))
+    decoder_state_input_c = Input(shape=(config["n_units"],))
+    decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]   
+    decoder_lstm = model.layers[3]
+    decoder_outputs, state_h_dec, state_c_dec = decoder_lstm(decoder_inputs, initial_state=decoder_states_inputs)
+    decoder_states = [state_h_dec, state_c_dec]
+    decoder_dense = model.layers[4]
+    decoder_outputs = decoder_dense(decoder_outputs)
+    decoder_model = Model([decoder_inputs] + decoder_states_inputs, [decoder_outputs] + decoder_states)
+    
+    return encoder_model, decoder_model
