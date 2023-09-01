@@ -1,6 +1,7 @@
 import logging
 import numpy as np
 import pandas as pd
+import typing as T
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 
@@ -13,7 +14,7 @@ def prepare_training_data(
     input_size: int,
     output_size: int,
     test_size: float = 0.2
-) -> tuple[
+) -> T.Tuple[
     np.ndarray,
     np.ndarray,
     np.ndarray,
@@ -42,7 +43,7 @@ def prepare_file_data(
     input_size: int,
     output_size: int,
     scaler: MinMaxScaler = None
-) -> tuple[
+) -> T.Tuple[
     np.ndarray,
     np.ndarray,
     MinMaxScaler
@@ -75,20 +76,20 @@ def inverse_scale_xy(
 
 
 def prepare_X(df: pd.DataFrame, input_size: int) -> np.ndarray:
-    X = df[df['label'] == 'wall']['x'].values
+    X = df[df['label'] == 'wall'][['x', 'y']].values.reshape(1, -1)[0]
     X = np.pad(
         X,
-        ((0, input_size - len(X))),
+        pad_width=(0, input_size - len(X)),
         mode='constant'
     )
     return X.reshape(-1, input_size)
 
 
 def prepare_y(df: pd.DataFrame, output_size: int) -> np.ndarray:
-    y = df[df['label'] == 'lintel']['y'].values
+    y = df[df['label'] == 'lintel'][['x', 'y']].values.reshape(1, -1)[0]
     y = np.pad(
         y,
-        ((0, output_size - len(y))),
+        (0, output_size - len(y)),
         mode='constant'
     )
     return y.reshape(-1, output_size)

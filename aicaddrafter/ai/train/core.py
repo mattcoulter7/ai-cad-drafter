@@ -1,6 +1,7 @@
 import sys
 import warnings
 import os
+import typing as T
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -15,7 +16,7 @@ def train_model(
     X_train: np.ndarray,
     y_train: np.ndarray,
     name: str,
-    config: dict[str, any]
+    config: T.Dict[str, any]
 ):
     """train
     train a single model.

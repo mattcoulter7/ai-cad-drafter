@@ -1,4 +1,4 @@
 from .core import (
-    interpret,
+    interpret_xy,
     interpret_df
 )

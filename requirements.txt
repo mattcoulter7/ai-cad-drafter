@@ -10,4 +10,4 @@ numpy
 gdown
 pandas
 keras
-tensorflow
+pyinstaller

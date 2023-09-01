@@ -1,4 +1,5 @@
 import logging
+import typing as T
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
@@ -9,7 +10,7 @@ logger = logging.getLogger()
 
 def interpret_df(
     df: pd.DataFrame
-):
+) -> T.Tuple[T.List[LineString], T.List[LineString]]:
     wall_points = df[df['label'] == 'wall'][['x', 'y']].values
     wall_lines = build_lines(wall_points)
 
@@ -22,34 +23,50 @@ def interpret_df(
     )
 
 
-def interpret(
+def interpret_xy(
     X: np.ndarray,
     y: np.ndarray,
-    scaler: MinMaxScaler = None
-):
-    wall_lines = build_lines(
-        points=build_points(
+    scaler: MinMaxScaler,
+    file: str
+) -> T.Tuple[T.List[LineString], T.List[LineString]]:
+    df = build_df(
+        X=X,
+        y=y,
+        scaler=scaler,
+        file=file
+    )
+
+    return interpret_df(df)
+
+
+def build_df(
+    X: np.ndarray,
+    y: np.ndarray,
+    scaler: MinMaxScaler,
+    file: str
+) -> pd.DataFrame:
+    points = [
+        *build_points(
             arr=X,
-            scaler=scaler
-        )
-    )
-
-    lintel_lines = build_lines(
-        points=build_points(
+            label="wall",
+            file=file
+        ),
+        *build_points(
             arr=y,
-            scaler=scaler
+            label="lintel",
+            file=file
         )
-    )
+    ]
 
-    return (
-        wall_lines,
-        lintel_lines
-    )
+    df = pd.DataFrame(points)
+    df[['x', 'y']] = scaler.inverse_transform(df[['x', 'y']].values)
+
+    return df
 
 
 def build_lines(
     points: np.ndarray
-) -> list[LineString]:
+) -> T.List[LineString]:
     lines = []
 
     for i in range(0, len(points), 2):
@@ -65,19 +82,17 @@ def build_lines(
 
 def build_points(
     arr: np.ndarray,
-    scaler: MinMaxScaler = None
+    label: str,
+    file: str
 ) -> np.ndarray:
-    x_vals = []
-    y_vals = []
+    points = []
 
     for entry in arr:
         for i in range(0, len(entry), 2):
-            x_val = entry[i]
-            y_val = entry[i+1]
-            x_vals.append(x_val)
-            y_vals.append(y_val)
-
-    xy_values = np.array(list(zip(x_vals, y_vals)))
-    if scaler is not None:
-        xy_values = scaler.inverse_transform(xy_values)
-    return xy_values
+            points.append({
+                'x': entry[i],
+                'y': entry[i+1],
+                'label': label,
+                'file': file
+            })
+    return points

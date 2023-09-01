@@ -9,11 +9,10 @@ def main():
     config = {
         "input_size": 2048,
         "output_size": 128,
-        "batch": 128,
+        "batch": 32,
         "epochs": 30
     }
-    with open(f"model/{version} spec.json", "w") as fp:
-        json.dump(config, fp)
+    json.dump(open(f"model/{version} spec.json", "w"))
 
     (
         X_train,
