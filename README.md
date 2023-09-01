@@ -23,17 +23,7 @@ To set up an Anaconda environment with Python 3.7 and TensorFlow GPU support, fo
 ## 1. Setup Conda Environment and Install Tensorflow 
 Following the instructions here to get Tensorflow installed https://www.tensorflow.org/install/pip#windows-native_1
 
-## 2. Verify Tensorflow GPU Installation (optional):
-You can verify that TensorFlow has been installed successfully by running a Python script within your activated environment:
-
-```python
-import tensorflow as tf
-print(tf.__version__)
-print(tf.config.list_physical_devices('GPU'))
-```
-The `print(tf.config.list_physical_devices('GPU'))` line should output information about the available GPUs if TensorFlow GPU support is properly configured.
-
-## 3. Install Requirements
+## 2. Install Requirements
 ```bash
 pip install -r requirements_dev.txt
 ```
