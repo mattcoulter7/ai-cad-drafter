@@ -8,7 +8,7 @@ load_dotenv()
 
 
 def main():
-    version = "0.1.1"
+    version = "0.1.2"
 
     config = json.load(open(f"model/{version} spec.json", "r"))
 

@@ -4,15 +4,15 @@ import json
 
 
 def main():
-    version = "0.1.1"
+    version = "0.1.2"
 
     config = {
-        "input_size": 2048,
-        "output_size": 128,
-        "batch": 32,
-        "epochs": 30
+        "input_size": 3072,
+        "output_size": 256,
+        "batch": 256,
+        "epochs": 50
     }
-    json.dump(open(f"model/{version} spec.json", "w"))
+    json.dump(config, open(f"model/{version} spec.json", "w"))
 
     (
         X_train,
@@ -26,8 +26,8 @@ def main():
     )
 
     aicaddrafter.ai.train.train_model(
-        model=aicaddrafter.ai.train.model.get_gru(
-            [config["input_size"], 1024, 512, 256, config["output_size"]]
+        model=aicaddrafter.ai.train.model.get_average(
+            [config["input_size"], 1024, 512, config["output_size"]]
         ),
         X_train=X_train,
         y_train=y_train,

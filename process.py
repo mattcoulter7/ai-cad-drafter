@@ -8,7 +8,7 @@ load_dotenv()
 
 
 def main():
-    version = "0.1.1"
+    version = "0.1.2"
 
     df = aicaddrafter.data.processor.process_files(
         file_names=os.getenv("FILE_NAMES").split(", "),
