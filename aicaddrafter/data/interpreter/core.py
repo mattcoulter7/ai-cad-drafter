@@ -26,12 +26,14 @@ def interpret_df(
 def interpret_xy(
     X: np.ndarray,
     y: np.ndarray,
+    config: dict,
     scaler: MinMaxScaler,
     file: str
 ) -> T.Tuple[T.List[LineString], T.List[LineString]]:
     df = build_df(
         X=X,
         y=y,
+        config=config,
         scaler=scaler,
         file=file
     )
@@ -42,17 +44,20 @@ def interpret_xy(
 def build_df(
     X: np.ndarray,
     y: np.ndarray,
+    config: dict,
     scaler: MinMaxScaler,
     file: str
 ) -> pd.DataFrame:
     points = [
         *build_points(
             arr=X,
+            config=config,
             label="wall",
             file=file
         ),
         *build_points(
             arr=y,
+            config=config,
             label="lintel",
             file=file
         )
@@ -82,17 +87,24 @@ def build_lines(
 
 def build_points(
     arr: np.ndarray,
+    config: dict,
     label: str,
     file: str
 ) -> np.ndarray:
     points = []
 
     for entry in arr:
-        for i in range(0, len(entry), 2):
-            points.append({
-                'x': entry[i],
-                'y': entry[i+1],
-                'label': label,
-                'file': file
-            })
+        point_buff = []
+        for generation in entry:
+            for token in generation:
+                point_buff.append(token)
+                if len(point_buff) == 2:
+                    points.append({
+                        "x": point_buff[0],
+                        "y": point_buff[1],
+                        "label": label,
+                        "file": file
+                    })
+                    point_buff = []
+
     return points
