@@ -1,3 +1,6 @@
+import typing as T
+import tensorflow as tf
+import keras
 from keras.layers import (
     Dense,
     Input,
@@ -14,22 +17,22 @@ from keras.models import (
 )
 
 
-def get_seq2seq(n_input_features, n_output_features, n_units):
+def get_seq2seq(config: dict) -> Model:
     # Input tensor for the encoder
-    encoder_inputs = Input(shape=(None, n_input_features))
+    encoder_inputs = Input(shape=(None, config["n_input_features"]))
 
     # LSTM encoder
-    encoder = LSTM(n_units, return_state=True)
+    encoder = LSTM(config["n_units"], return_state=True)
     encoder_outputs, state_h, state_c = encoder(encoder_inputs)
     # Discard `encoder_outputs` and only keep the states.
     encoder_states = [state_h, state_c]
 
     # Set up the decoder. The decoder will use `encoder_states` as its initial state.
-    decoder_inputs = Input(shape=(None, n_output_features))
-    decoder_lstm = LSTM(n_units, return_sequences=True, return_state=True)
+    decoder_inputs = Input(shape=(None, config["n_output_features"]))
+    decoder_lstm = LSTM(config["n_units"], return_sequences=True, return_state=True)
     
     decoder_outputs, _, _ = decoder_lstm(decoder_inputs, initial_state=encoder_states)
-    decoder_dense = Dense(n_output_features, activation='relu')
+    decoder_dense = Dense(config["n_output_features"], activation='relu')
     decoder_outputs = decoder_dense(decoder_outputs)
 
     # Create the model
@@ -38,7 +41,7 @@ def get_seq2seq(n_input_features, n_output_features, n_units):
     return model
 
 
-def load_models(fp, config):
+def load_models(fp, config) -> T.Tuple[Model, Model]:
     model = load_model(fp)
     # Detailed layer extraction depends on saved model structure
     encoder_inputs = model.input[0]

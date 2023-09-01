@@ -1,21 +1,25 @@
 import aicaddrafter
 import pandas as pd
 import json
-import numpy as np
 
-version = "0.1.5"
+version = "0.1.6"
 
 
 def main():
     config = {
         "input_size": 3072,
         "output_size": 128,
-        "n_input_features": 4,  # x and y, start and end,
-        "n_output_features": 4,  # x and y, start and end
-        "max_output_seq_len": 32,
+        "n_input_features": 2,  # x and y, start and end,
+        "n_output_features": 2,  # x and y, start and end,
+        "max_output_seq_len": 128,
         "n_units": 64,
-        "batch": 64,
-        "epochs": 100
+        "batch": 1,
+        "epochs": 8,
+        "schedule_ratio": 0.5,
+        "learning_rate": 0.0001,
+        "print_every": 1,
+        "k_max": 1,
+        "schedule_type": "linear"
     }
     json.dump(config, open(f"model/{version} spec.json", "w"))
 
@@ -23,16 +27,12 @@ def main():
         X_train,
         y_train,
     ) = aicaddrafter.data.preparer.prepare_training_data(
-        pd.read_csv(f"data/{version}.processed.csv"),
+        pd.read_csv(f"data/processed.csv"),
         config=config
     )
 
     aicaddrafter.ai.train.train_model(
-        model=aicaddrafter.ai.train.model.get_seq2seq(
-            n_input_features=config["n_input_features"],
-            n_units=config["n_units"],
-            n_output_features=config["n_output_features"]
-        ),
+        model=aicaddrafter.ai.train.model.get_seq2seq(config),
         X_train=[X_train, y_train],
         y_train=y_train,
         name=version,
