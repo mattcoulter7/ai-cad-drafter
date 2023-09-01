@@ -20,26 +20,10 @@ Train AI to draw 90x90mm square using **RECTANGLE** command on **S-COL-POST** la
 # DEVELOPMENT ENVIRONMENT
 To set up an Anaconda environment with Python 3.7 and TensorFlow GPU support, follow these steps:
 
-## 1. Install Anaconda:
-If you don't have Anaconda installed, download and install it from the official Anaconda website: https://www.anaconda.com/products/distribution
-
-## 2. Create a New Environment:
-Open a terminal or Anaconda Prompt and create a new environment named "tf_gpu_env" with Python 3.7 by running the following command:
-
-```bash
-conda create -n tf_gpu_env python=3.7
-```
-
-## 3. Activate the Environment:
-Activate the newly created environment using the following command:
-```bash
-conda activate tf_gpu_env
-```
-
-## 4. Install Tensorflow
+## 1. Setup Conda Environment and Install Tensorflow 
 Following the instructions here to get Tensorflow installed https://www.tensorflow.org/install/pip#windows-native_1
 
-## 5. Verify Tensorflow GPU Installation (optional):
+## 2. Verify Tensorflow GPU Installation (optional):
 You can verify that TensorFlow has been installed successfully by running a Python script within your activated environment:
 
 ```python
@@ -49,7 +33,7 @@ print(tf.config.list_physical_devices('GPU'))
 ```
 The `print(tf.config.list_physical_devices('GPU'))` line should output information about the available GPUs if TensorFlow GPU support is properly configured.
 
-## 6. Install Requirements
+## 3. Install Requirements
 ```bash
 pip install -r requirements_dev.txt
 ```
