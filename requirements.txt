@@ -7,3 +7,7 @@ pyautocad
 msgpack
 scikit-learn
 numpy
+gdown
+pandas
+keras
+pyinstaller

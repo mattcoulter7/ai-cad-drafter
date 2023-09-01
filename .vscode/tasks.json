@@ -20,7 +20,35 @@
             "group": {
                 "kind": "build"
             }
+        },
+        {
+            "label": "Build PyPI Package",
+            "type": "shell",
+            "command": "python setup.py sdist bdist_wheel",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "label": "Upload to PyPI",
+            "type": "shell",
+            "command": "twine upload dist/*",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build"
+            }
+        },
+        {
+            "label": "Build .exe",
+            "type": "shell",
+            "command": "activate nf && pyinstaller --onedir --console --name \"ai-cad-drafter\" --log-level \"FATAL\" \"./test.py\"",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build"
+            }
         }
+    
     ],
     "inputs": [
         {
