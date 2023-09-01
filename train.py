@@ -4,12 +4,12 @@ import json
 
 
 def main():
-    version = "0.1.2"
+    version = "0.1.3"
 
     config = {
         "input_size": 3072,
         "output_size": 256,
-        "batch": 1024,
+        "batch": 128,
         "epochs": 500
     }
     json.dump(config, open(f"model/{version} spec.json", "w"))
