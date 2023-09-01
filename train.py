@@ -1,30 +1,39 @@
 import aicaddrafter
 import pandas as pd
+import json
 
 
 def main():
+    version = "0.1.1"
+
+    config = {
+        "input_size": 2048,
+        "output_size": 128,
+        "batch": 128,
+        "epochs": 30
+    }
+    with open(f"model/{version} spec.json", "w") as fp:
+        json.dump(config, fp)
+
     (
         X_train,
         X_test,
         y_train,
         y_test
     ) = aicaddrafter.data.preparer.prepare_training_data(
-        pd.read_csv("data/processed.csv"),
-        input_size=1024,
-        output_size=128
+        pd.read_csv(f"data/{version}.processed.csv"),
+        input_size=config["input_size"],
+        output_size=config["output_size"]
     )
 
     aicaddrafter.ai.train.train_model(
         model=aicaddrafter.ai.train.model.get_gru(
-            [1024, 512, 256, 128]
+            [config["input_size"], 1024, 512, 256, config["output_size"]]
         ),
         X_train=X_train,
         y_train=y_train,
-        name="0.1.0",
-        config={
-            "batch": 128,
-            "epochs": 200
-        }
+        name=version,
+        config=config
     )
 
     pass

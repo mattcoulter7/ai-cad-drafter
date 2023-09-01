@@ -8,15 +8,17 @@ load_dotenv()
 
 
 def main():
+    version = "0.1.1"
+
     file_name = os.getenv("FILE_NAMES").split(", ")[0]
-    df = pd.read_csv("data/processed.csv")
+    df = pd.read_csv(f"data/{version}.processed.csv")
     X_test, y_true, scaler = aicaddrafter.data.preparer.prepare_file_data(
         df[df["file"] == file_name],
         input_size=1024,
         output_size=128
     )
     model = aicaddrafter.ai.train.model.load_model(
-        "model/0.1.0.h5"
+        f"model/{version}.h5"
     )
     y_pred = model.predict(X_test)
 

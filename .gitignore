@@ -159,8 +159,10 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-# pickle files
-*.pkl
-*.dxf
-*.csv
-*.h5
+# generated data
+data/*.pkl
+data/*.dxf
+data/*.csv
+model/*.csv
+model/*.h5
+model/*.json
