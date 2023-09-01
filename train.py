@@ -9,8 +9,8 @@ def main():
     config = {
         "input_size": 3072,
         "output_size": 256,
-        "batch": 256,
-        "epochs": 50
+        "batch": 1024,
+        "epochs": 500
     }
     json.dump(config, open(f"model/{version} spec.json", "w"))
 

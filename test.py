@@ -15,27 +15,17 @@ def main():
     df = pd.read_csv(f"data/{version}.processed.csv")
     file_name = random.choice(df['file'].unique())
     df = df[df["file"] == file_name]
-
-    # Render 1 - file untouched
-    (
-        wall_lines_raw,
-        lintel_lines_raw,
-    ) = aicaddrafter.data.interpreter.interpret_df(df)
-    aicaddrafter.renderer.render(
-        lines=[
-            *wall_lines_raw,
-            *lintel_lines_raw
-        ],
-        polygons=[]
-    )
-
-    # Render 2 - file with scaling HAS ISSUE
     X_test, y_true, scaler = aicaddrafter.data.preparer.prepare_file_data(
         df,
         input_size=config["input_size"],
         output_size=config["output_size"]
     )
+    model = aicaddrafter.ai.train.model.load_model(
+        f"model/{version}.h5"
+    )
+    y_pred = model.predict(X_test)
 
+    # Render 1 - true
     (
         wall_lines,
         lintel_lines,
@@ -53,11 +43,7 @@ def main():
         polygons=[]
     )
 
-    # Render 3 - prediction
-    model = aicaddrafter.ai.train.model.load_model(
-        f"model/{version}.h5"
-    )
-    y_pred = model.predict(X_test)
+    # Render 3 - pred
     (
         wall_lines,
         lintel_lines_pred,
