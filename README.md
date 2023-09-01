@@ -37,9 +37,9 @@ conda activate tf_gpu_env
 ```
 
 ## 4. Install Tensorflow
-Following the instructions here to get Tensorflow installed https://www.tensorflow.org/install/pip
+Following the instructions here to get Tensorflow installed https://www.tensorflow.org/install/pip#windows-native_1
 
-## 5. Verify Installation:
+## 5. Verify Tensorflow GPU Installation (optional):
 You can verify that TensorFlow has been installed successfully by running a Python script within your activated environment:
 
 ```python
