@@ -1,11 +1,7 @@
 import logging
-import typing as T
 import numpy as np
 import pandas as pd
-from pathlib import Path
-from shapely import LineString
 from sklearn.preprocessing import MinMaxScaler
-from concurrent.futures import ThreadPoolExecutor
 from sklearn.model_selection import train_test_split
 
 
@@ -15,37 +11,84 @@ logger = logging.getLogger()
 def prepare_training_data(
     df: pd.DataFrame,
     input_size: int,
-    output_size: int
-):
-    xy_values = df[['x', 'y']].values
-
-    # normalise the x and y values
-    xy_scalar = MinMaxScaler(feature_range=(0, 1)).fit(xy_values)
-    df[['x', 'y']] = xy_scalar.transform(xy_values)
-
+    output_size: int,
+    test_size: float = 0.2
+) -> tuple[
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+]:
     # build train and test data
     X, y = [], []
-    for _ in df['file'].unique():
-        X_temp = []
-        for xy in df[df['label'] == 'wall'][['x', 'y']].values:
-            X_temp.extend(xy)
-
-        y_temp = []
-        for xy in df[df['label'] == 'lintel'][['x', 'y']].values:
-            y_temp.extend(xy)
-
-        X_temp = np.pad(X_temp, ((0, input_size - len(X_temp))), mode='constant')
-        y_temp = np.pad(y_temp, ((0, output_size - len(y_temp))), mode='constant')
-
-        X.append(X_temp)
-        y.append(y_temp)
-
-        # TODO remove this, I don't have enough testing data yet lol
-        X.append(X_temp)
-        y.append(y_temp)
+    for file in df['file'].unique():
+        X_file, y_file, _ = prepare_file_data(
+            df=pd.DataFrame(df[df['file'] == file]),
+            input_size=input_size,
+            output_size=output_size
+        )
+        X.append(X_file)
+        y.append(y_file)
 
     # convert to numpy arrays
-    X = np.array(X)
-    y = np.array(y)
+    X = np.array(X).reshape(-1, input_size)
+    y = np.array(y).reshape(-1, output_size)
 
-    return train_test_split(X, y, test_size=0.2)
+    return train_test_split(X, y, test_size=test_size)
+
+
+def prepare_file_data(
+    df: pd.DataFrame,
+    input_size: int,
+    output_size: int,
+    scaler: MinMaxScaler = None
+) -> tuple[
+    np.ndarray,
+    np.ndarray,
+    MinMaxScaler
+]:
+    scaler = scale_xy(df, scaler)
+    return (
+        prepare_X(df, input_size),
+        prepare_y(df, output_size),
+        scaler
+    )
+
+
+def scale_xy(
+    df: pd.DataFrame,
+    scaler: MinMaxScaler = None
+) -> MinMaxScaler:
+    xy_values = df[['x', 'y']].values
+    scaler = scaler or MinMaxScaler(feature_range=(0, 1)).fit(xy_values)
+    df[['x', 'y']] = scaler.transform(xy_values)
+    return scaler
+
+
+def inverse_scale_xy(
+    df: pd.DataFrame,
+    scaler: MinMaxScaler
+) -> MinMaxScaler:
+    xy_values = df[['x', 'y']].values
+    df[['x', 'y']] = scaler.inverse_transform(xy_values)
+    return scaler
+
+
+def prepare_X(df: pd.DataFrame, input_size: int) -> np.ndarray:
+    X = df[df['label'] == 'wall']['x'].values
+    X = np.pad(
+        X,
+        ((0, input_size - len(X))),
+        mode='constant'
+    )
+    return X.reshape(-1, input_size)
+
+
+def prepare_y(df: pd.DataFrame, output_size: int) -> np.ndarray:
+    y = df[df['label'] == 'lintel']['y'].values
+    y = np.pad(
+        y,
+        ((0, output_size - len(y))),
+        mode='constant'
+    )
+    return y.reshape(-1, output_size)
