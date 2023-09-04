@@ -2,7 +2,7 @@ import aicaddrafter
 import pandas as pd
 import json
 
-version = "0.1.6"
+version = "0.2.0"
 
 
 def main():
@@ -12,17 +12,18 @@ def main():
         "n_input_features": 2,  # x and y, start and end,
         "n_output_features": 2,  # x and y, start and end,
         "max_output_seq_len": 128,
-        "n_units": 64,
-        "batch": 1,
+        "n_units": 32,
+        "batch": 256,
         "epochs": 8,
-        "schedule_ratio": 0.5,
         "learning_rate": 0.0001,
-        "print_every": 1,
-        "k_max": 1,
-        "schedule_type": "linear"
+        # "min_context_length": 8,
+        # "max_context_lag": 4,
+        "max_context_length": 64,
+        "lookahead": 1
     }
     json.dump(config, open(f"model/{version} spec.json", "w"))
 
+    # prepare the training data in terms of inputs and outputs
     (
         X_train,
         y_train,
@@ -31,15 +32,28 @@ def main():
         config=config
     )
 
-    aicaddrafter.ai.train.train_model(
-        model=aicaddrafter.ai.train.model.get_seq2seq(config),
-        X_train=[X_train, y_train],
-        y_train=y_train,
-        name=version,
+    # transform the training data for seq2seq model
+    # this is for optimising generation of a single token
+    (
+        encoder_inputs,
+        decoder_inputs
+    ),  decoder_outputs = aicaddrafter.data.preparer.prepare_sequence_training_data(
+        X=X_train,
+        y=y_train,
         config=config
     )
 
-    pass
+    # run the training
+    aicaddrafter.ai.train.train_model(
+        model=aicaddrafter.ai.train.model.get_seq2seq(config),
+        X_train=(
+            encoder_inputs,
+            decoder_inputs
+        ),
+        y_train=decoder_outputs,
+        name=version,
+        config=config
+    )
 
 
 if __name__ == "__main__":

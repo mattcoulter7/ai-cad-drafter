@@ -9,6 +9,7 @@ from sklearn.model_selection import train_test_split
 logger = logging.getLogger()
 
 
+
 def prepare_training_data(
     df: pd.DataFrame,
     config: dict
@@ -70,7 +71,7 @@ def inverse_scale_xy(
     return scaler
 
 
-def prepare_X(df: pd.DataFrame, config: int) -> np.ndarray:
+def prepare_X(df: pd.DataFrame, config: dict) -> np.ndarray:
     X = df[df['label'] == 'wall'][['x', 'y']].values.reshape(1, -1)[0]
     X = np.pad(
         X,
@@ -80,7 +81,7 @@ def prepare_X(df: pd.DataFrame, config: int) -> np.ndarray:
     return X.reshape(1, X.shape[0] // config["n_input_features"], config["n_input_features"])
 
 
-def prepare_y(df: pd.DataFrame, config: int) -> np.ndarray:
+def prepare_y(df: pd.DataFrame, config: dict) -> np.ndarray:
     y = df[df['label'] == 'lintel'][['x', 'y']].values.reshape(1, -1)[0]
     y = np.pad(
         y,

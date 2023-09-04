@@ -6,7 +6,7 @@ import numpy as np
 from dotenv import load_dotenv
 
 load_dotenv()
-version = "0.1.6"
+version = "0.2.0"
 
 
 def predict_sequence(
@@ -16,25 +16,23 @@ def predict_sequence(
     config: dict
 ):
     states = encoder_model.predict(input_sequence)
-    target_sequence = np.array([[[0, 0.5, 1, 0.5]]])
-    predicted_sequence = []
+    sequence = [np.zeros(config["n_output_features"])]
 
     for _ in range(config["max_output_seq_len"]):
-        output_tokens, h, c = decoder_model.predict([target_sequence] + states)
+        output_tokens, h, c = decoder_model.predict([np.array([sequence])] + states)
         # if np.all(output_tokens[0,0,:] == 0):
         #     break
 
-        predicted_sequence.append(output_tokens[0,0,:])
+        sequence.append(output_tokens[0, 0, :])
         states = [h, c]
-        target_sequence = output_tokens
 
-    print(predicted_sequence)
+    print(sequence)
 
-    return np.array([predicted_sequence])
+    return np.array([sequence[1:]])
 
 def main():
     config = json.load(open(f"model/{version} spec.json", "r"))
-    config["max_output_seq_len"] = 512
+    config["max_output_seq_len"] = config.get("max_output_seq_len", 64)
     df = pd.read_csv(f"data/processed.csv")
     file_name = random.choice(df['file'].unique())
     df = df[df["file"] == file_name]
