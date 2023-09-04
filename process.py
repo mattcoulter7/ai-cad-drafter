@@ -15,7 +15,7 @@ def main():
         perform_augmentation=True
     )
 
-    path = Path(f"data/{version}.processed.csv")
+    path = Path(f"data/processed.csv")
     df.to_csv(
         path,
         index=False,
