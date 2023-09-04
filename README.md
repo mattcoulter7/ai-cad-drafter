@@ -18,8 +18,6 @@ Draft line using **LINE** command in place of opening on **LINTEL** layer
 Train AI to draw 90x90mm square using **RECTANGLE** command on **S-COL-POST** layer
 
 # DEVELOPMENT ENVIRONMENT
-To set up an Anaconda environment with Python 3.7 and TensorFlow GPU support, follow these steps:
-
 ## 1. Setup Conda Environment and Install Tensorflow 
 Following the instructions here to get Tensorflow installed https://www.tensorflow.org/install/pip#windows-native_1
 
